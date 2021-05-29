@@ -67,7 +67,6 @@ const Chat = props => {
   
           (isAbatch === true) ? content.forEach(updateGroupedMessages(content)) : updateGroupedMessages(content)
   
-         // setCurrentMessages([...currentMessages], currentMessages.push({status:200}))
           setCurrentMessages([...groupedMessages])
   
         }
