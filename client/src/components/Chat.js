@@ -6,24 +6,31 @@ const socket = io(URL, { autoConnect: false , cors: {origin: '*'}})
 
 const Chat = props => {
 
+
     const [currentMessages, setCurrentMessages] = useState([
       {
+        groupID: 'gp0',
         from: 'me',
         messages: [
-            {content: 'Yes, Dovahkin?!', hour: '10:53', date: '2021-05-06', day: 'quarta-feira'},
-            {content: 'Watch the skies, traveler?', hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
-            {content: 'Let me guess...?', hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
+            {content: 'Yes, Dovahkin?!', id: 'gp0m0', hour: '10:53', date: '2021-05-06', day: 'quarta-feira'},
+            {content: 'Watch the skies, traveler?',id: 'gp0m1', hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
+            {content: 'Let me guess...?', id: 'gp0m2', hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
         ]
     },
     {
+      groupID: 'gp1',
       from: 'marianasWeeb',
       messages: [
-          {content: 'Citizen!', hour: '10:53', date: '2021-05-06', day: 'quarta-feira'},
-          {content: 'I used to be an adventurer like you', hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
-          {content: 'No lollygaggin', hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
+          {content: 'Citizen!', id: 'gp1m0' , hour: '10:53', date: '2021-05-06', day: 'quarta-feira'},
+          {content: 'I used to be an adventurer like you', id: 'gp1m1' , hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
+          {content: 'No lollygaggin', id: 'gp1m2' , hour: '10:54', date: '2021-05-06', day: 'quarta-feira'},
       ]
     }
     ])
+
+
+  
+    //const [currentMessages, setCurrentMessages] = useState([])
   
     const messageComposer = useRef(null)
 
@@ -48,19 +55,22 @@ const Chat = props => {
   
           let [...groupedMessages] = currentMessages
           let lastGroup = getLastElement(groupedMessages)
-          let arr = []
   
           const updateGroupedMessages = message => {
-              arr.push(message)
-              if((lastGroup !== null && lastGroup.from) && lastGroup.from === message.from)
-              { 
-                lastGroup.messages.push(message)
-              }else{
-                groupedMessages.push({
-                  from: content.from,
-                  messages:[message]
-                })
-              }
+            if((lastGroup !== null && lastGroup.from) && lastGroup.from === message.from)
+            { 
+              message.id = lastGroup.groupID +'m' + lastGroup.messages.length
+              
+              lastGroup.messages.push(message)
+            }else{
+              message.id = 'gp' + groupedMessages.length +'m' + lastGroup.messages.length
+
+              groupedMessages.push({
+                groupID: `gp${groupedMessages.length}`,
+                from: content.from,
+                messages:[message]
+              })
+            }
             console.log('groupedMessages ', groupedMessages)
           }
   
@@ -117,19 +127,16 @@ const Chat = props => {
       socket.connect()
       
     },[])
-    
-//{currentMessages.map(group => {group.messages.map(message => (<p>{message.content}</p>))})}
-
-  
+     
   
     return (
       <div id='chat-body'>
         <div id='messages-box'>
           {currentMessages.map(group => {
             return(
-              <div>
+              <div key={group.groupID} data={group.groupID}>
                 <h5>{group.from}</h5>
-                {group.messages.map(message => (<p>{message.content}</p>))}
+                {group.messages.map(message => (<p key={message.id}>{message.content}</p>))}
               </div>
             )
           })}
